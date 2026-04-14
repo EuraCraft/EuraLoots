@@ -2,6 +2,8 @@ package com.codisimus.plugins.phatloots.loot;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -10,9 +12,13 @@ import org.bukkit.inventory.ItemStack;
  * @author Codisimus
  */
 public class LootBundle {
+    public record RareItemDrop(ItemStack item, double effectiveChancePercent) {}
+
     private final List<ItemStack> itemList;
+    private final List<RareItemDrop> rareItemDrops = new LinkedList<>();
     private final List<CommandLoot> commandList = new LinkedList<>();
     private final List<String> messageList = new LinkedList<>();
+    private final Deque<Double> chanceMultipliers = new ArrayDeque<>();
     private double money = 0;
     private int exp = 0;
 
@@ -23,6 +29,7 @@ public class LootBundle {
      */
     public LootBundle(List<ItemStack> itemList) {
         this.itemList = itemList;
+        chanceMultipliers.push(1.0D);
     }
 
     /**
@@ -30,6 +37,7 @@ public class LootBundle {
      */
     public LootBundle() {
         this.itemList = new LinkedList<>();
+        chanceMultipliers.push(1.0D);
     }
 
     /**
@@ -47,7 +55,54 @@ public class LootBundle {
      * @param item The given ItemStack to add as loot
      */
     public void addItem(ItemStack item) {
+        addItem(item, getCurrentChancePercent());
+    }
+
+    /**
+     * Adds the given item to the list of looted items and tracks its effective chance
+     *
+     * @param item The given ItemStack to add as loot
+     * @param effectiveChancePercent The effective chance in percent that produced the item
+     */
+    public void addItem(ItemStack item, double effectiveChancePercent) {
         itemList.add(item);
+        rareItemDrops.add(new RareItemDrop(item, effectiveChancePercent));
+    }
+
+    /**
+     * Returns all looted items with their effective chances
+     *
+     * @return The list of looted items and effective chance percentages
+     */
+    public List<RareItemDrop> getRareItemDrops() {
+        return rareItemDrops;
+    }
+
+    /**
+     * Pushes a chance multiplier to apply while rolling nested loot
+     *
+     * @param multiplier The multiplier to push
+     */
+    public void pushChanceMultiplier(double multiplier) {
+        chanceMultipliers.push(chanceMultipliers.peek() * multiplier);
+    }
+
+    /**
+     * Pops the last chance multiplier
+     */
+    public void popChanceMultiplier() {
+        if (chanceMultipliers.size() > 1) {
+            chanceMultipliers.pop();
+        }
+    }
+
+    /**
+     * Returns the current effective chance in percent
+     *
+     * @return The current effective chance percent
+     */
+    public double getCurrentChancePercent() {
+        return chanceMultipliers.peek() * 100.0D;
     }
 
     /**

@@ -152,6 +152,7 @@ Messages:
     MobDroppedExperience: ''
     LootMessage: ''
     LootBroadcast: ''
+    RareItemBroadcast: '{player} a trouvé {item} !'
     LootConditionsNotMet: '&4You cannot loot this chest at this time!'
     ResetTimeForever: 'forever'
     ResetTimeDays: 'day(s)'

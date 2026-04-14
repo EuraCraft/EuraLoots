@@ -54,6 +54,7 @@ public class PhatLootsConfig {
     public static String mobDroppedExperience;
     public static String lootMessage;
     public static String lootBroadcast;
+    public static String rareItemBroadcast;
     public static String lootConditionsNotMet;
     public static String resetTimeForever;
     public static String resetTimeDays;
@@ -148,6 +149,7 @@ public class PhatLootsConfig {
         mobDroppedExperience = getString(section, "MobDroppedExperience");
         lootMessage = getString(section, "LootMessage");
         lootBroadcast = getString(section, "LootBroadcast");
+        rareItemBroadcast = getString(section, "RareItemBroadcast");
         lootConditionsNotMet = getString(section, "LootConditionsNotMet");
         resetTimeForever = getString(section, "ResetTimeForever");
         resetTimeDays = getString(section, "ResetTimeDays");

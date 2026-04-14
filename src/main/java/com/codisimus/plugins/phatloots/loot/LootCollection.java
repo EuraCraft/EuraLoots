@@ -123,7 +123,9 @@ public class LootCollection extends Loot {
             for (Loot loot : lootList) {
                 if (loot.rollForLoot(lootingBonus)) {
                     if (loot.rollForLoot(lootingBonus)) {
+                        lootBundle.pushChanceMultiplier(toPercentChanceFactor(loot.getProbability()) * toPercentChanceFactor(loot.getProbability()));
                         loot.getLoot(lootBundle, lootingBonus);
+                        lootBundle.popChanceMultiplier();
                     }
                 }
             }
@@ -152,7 +154,9 @@ public class LootCollection extends Loot {
                         roll -= loot.getProbability();
                         if (roll <= 0) {
                             //Give this loot
+                            lootBundle.pushChanceMultiplier(total <= 0 ? 0 : Math.max(loot.getProbability(), 0) / total);
                             loot.getLoot(lootBundle, lootingBonus);
+                            lootBundle.popChanceMultiplier();
                             if (!allowDuplicates) {
                                 removed.add(loot);
                                 lootList.remove(loot);
@@ -259,6 +263,10 @@ public class LootCollection extends Loot {
      */
     public boolean isRollForEach() {
         return upperNumberOfLoots <= 0;
+    }
+
+    private static double toPercentChanceFactor(double probability) {
+        return Math.max(0, Math.min(probability, 100.0D)) / 100.0D;
     }
 
     /**

@@ -56,6 +56,7 @@ public final class PhatLoot implements ConfigurationSerializable {
     static boolean unlink; //True if global chests that never reset should be unlinked after looting
     static boolean soundOnAutoLoot;
     static boolean commandCooldown;
+    private static final double RARE_ITEM_BROADCAST_THRESHOLD_PERCENT = 0.000337D;
 
     public String name; //A unique name for the PhatLoot
     public List<Loot> lootList; //List of Loot
@@ -495,6 +496,8 @@ public final class PhatLoot implements ConfigurationSerializable {
             flagToBreak = PhatLootChest.useBreakAndRepawn && breakAndRespawn;
         }
 
+        broadcastRareItems(player, lootBundle);
+
         //Send loot notification messages
         if (PhatLootsConfig.lootMessage != null) {
             player.sendMessage(PhatLootsConfig.lootMessage.replace("<phatloot>", name));
@@ -513,6 +516,22 @@ public final class PhatLoot implements ConfigurationSerializable {
         //Update the time that the user looted
         setTime(player, chest);
         return flagToBreak;
+    }
+
+    private void broadcastRareItems(Player player, LootBundle lootBundle) {
+        if (player == null || PhatLootsConfig.rareItemBroadcast == null) {
+            return;
+        }
+
+        for (LootBundle.RareItemDrop drop : lootBundle.getRareItemDrops()) {
+            if (drop.effectiveChancePercent() <= RARE_ITEM_BROADCAST_THRESHOLD_PERCENT + 1.0E-12D) {
+                String itemName = PhatLootsUtil.getItemName(drop.item());
+                String message = PhatLootsConfig.rareItemBroadcast
+                        .replace("{player}", player.getName())
+                        .replace("{item}", itemName);
+                Bukkit.broadcastMessage(message);
+            }
+        }
     }
 
     /**
@@ -782,10 +801,16 @@ public final class PhatLoot implements ConfigurationSerializable {
     public LootBundle rollForLoot(LootBundle lootBundle, double lootingBonus) {
         for (Loot loot : lootList) {
             if (loot.rollForLoot(lootingBonus)) {
+                lootBundle.pushChanceMultiplier(toPercentChanceFactor(loot.getProbability()));
                 loot.getLoot(lootBundle, lootingBonus);
+                lootBundle.popChanceMultiplier();
             }
         }
         return lootBundle;
+    }
+
+    private static double toPercentChanceFactor(double probability) {
+        return Math.max(0, Math.min(probability, 100.0D)) / 100.0D;
     }
 
     /**
