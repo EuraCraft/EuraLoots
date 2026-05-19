@@ -71,6 +71,17 @@ public class Tool {
         meta.setLore(lore);
         item.setItemMeta(meta);
         new Tool("MODIFY_AMOUNT", item).registerTool();
+
+        item = new ItemStack(Material.PAPER);
+        meta = Bukkit.getItemFactory().getItemMeta(item.getType());
+        lore.clear();
+        meta.setDisplayName("§2Add drop message (Click to change Tool)");
+        lore.add("§4LEFT CLICK:");
+        lore.add("§6 Toggle drop broadcast message");
+        lore.add("§6 for item loot");
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        new Tool("ADD_DROP_MESSAGE", item).registerTool();
     }
 
     /**

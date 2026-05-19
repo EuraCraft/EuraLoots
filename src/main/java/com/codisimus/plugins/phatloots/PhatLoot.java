@@ -495,6 +495,16 @@ public final class PhatLoot implements ConfigurationSerializable {
             flagToBreak = PhatLootChest.useBreakAndRepawn && breakAndRespawn;
         }
 
+        //Broadcast configured item drop messages for chest loot
+        if (chest != null) {
+            for (String displayName : lootBundle.getDropMessageList()) {
+                Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + player.getName()
+                                        + ChatColor.LIGHT_PURPLE + " vient de trouver "
+                                        + ChatColor.GOLD + displayName
+                                        + ChatColor.LIGHT_PURPLE + " dans un coffre !");
+            }
+        }
+
         //Send loot notification messages
         if (PhatLootsConfig.lootMessage != null) {
             player.sendMessage(PhatLootsConfig.lootMessage.replace("<phatloot>", name));

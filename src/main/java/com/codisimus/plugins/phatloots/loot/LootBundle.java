@@ -13,6 +13,7 @@ public class LootBundle {
     private final List<ItemStack> itemList;
     private final List<CommandLoot> commandList = new LinkedList<>();
     private final List<String> messageList = new LinkedList<>();
+    private final List<String> dropMessageList = new LinkedList<>();
     private double money = 0;
     private int exp = 0;
 
@@ -84,6 +85,24 @@ public class LootBundle {
      */
     public void addMessage(String msg) {
         messageList.add(msg);
+    }
+
+    /**
+     * Returns the list of drop messages to broadcast.
+     *
+     * @return The list of drop messages
+     */
+    public List<String> getDropMessageList() {
+        return dropMessageList;
+    }
+
+    /**
+     * Adds the given message to the list of drop messages.
+     *
+     * @param msg The given message to broadcast
+     */
+    public void addDropMessage(String msg) {
+        dropMessageList.add(msg);
     }
 
     /**
