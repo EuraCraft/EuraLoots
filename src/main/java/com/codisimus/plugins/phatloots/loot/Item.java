@@ -2,6 +2,7 @@ package com.codisimus.plugins.phatloots.loot;
 
 import com.codisimus.plugins.phatloots.PhatLoot;
 import com.codisimus.plugins.phatloots.PhatLoots;
+import com.codisimus.plugins.phatloots.gui.Tool;
 import com.codisimus.plugins.phatloots.util.PhatLootsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -159,6 +160,7 @@ public class Item extends Loot {
     public boolean generateName = false;
     public boolean randomLore = false;
     public boolean tieredName = false;
+    public boolean dropMessage = false;
 
     /**
      * Constructs a new Loot with the given ItemStack and bonus amount
@@ -203,6 +205,9 @@ public class Item extends Loot {
             if (map.containsKey(currentLine = "Tiered")) {
                 tieredName = (Boolean) map.get(currentLine);
             }
+            if (map.containsKey(currentLine = "drop-message")) {
+                dropMessage = (Boolean) map.get(currentLine);
+            }
         } catch (Exception ex) {
             //Print debug messages
             PhatLoots.logger.severe("Failed to load Item line: " + currentLine);
@@ -222,6 +227,9 @@ public class Item extends Loot {
     @Override
     public void getLoot(LootBundle lootBundle, double lootingBonus) {
         lootBundle.addItem(getItem());
+        if (dropMessage) {
+            lootBundle.addDropMessage(getConfiguredDisplayName());
+        }
     }
 
     /**
@@ -269,6 +277,7 @@ public class Item extends Loot {
         if (tieredName) {
             details.add(ChatColor.GOLD + "Tiered Name");
         }
+        details.add(ChatColor.DARK_BLUE + "Drop message: " + ChatColor.GOLD + (dropMessage ? "True" : "False"));
 
         //Construct the ItemStack and return it
         info.setLore(details);
@@ -297,6 +306,22 @@ public class Item extends Loot {
         default:
             return false;
         }
+        return true;
+    }
+
+    /**
+     * Manages clicking on Item Loot with a custom Tool
+     *
+     * @param tool The Tool that was used to click
+     * @param click The type of Click
+     * @return true if the Loot InfoStack should be refreshed
+     */
+    @Override
+    public boolean onToolClick(Tool tool, ClickType click) {
+        if (!tool.getName().equals("ADD_DROP_MESSAGE") || click != ClickType.LEFT) {
+            return false;
+        }
+        dropMessage = !dropMessage;
         return true;
     }
 
@@ -931,6 +956,18 @@ public class Item extends Loot {
         }
     }
 
+    /**
+     * Returns the configured display name for the item before generated loot mutations.
+     *
+     * @return The configured display name, or the friendly item name if there is none
+     */
+    private String getConfiguredDisplayName() {
+        if (item.hasItemMeta() && item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
+            return item.getItemMeta().getDisplayName();
+        }
+        return PhatLootsUtil.getItemName(item);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -970,7 +1007,8 @@ public class Item extends Loot {
                 && loot.autoEnchant == autoEnchant
                 && loot.generateName == generateName
                 && loot.randomLore == randomLore
-                && loot.tieredName == tieredName;
+                && loot.tieredName == tieredName
+                && loot.dropMessage == dropMessage;
     }
 
     @Override
@@ -984,6 +1022,7 @@ public class Item extends Loot {
         hash = 37 * hash + (generateName ? 1 : 0);
         hash = 37 * hash + (randomLore ? 1 : 0);
         hash = 37 * hash + (tieredName ? 1 : 0);
+        hash = 37 * hash + (dropMessage ? 1 : 0);
         return hash;
     }
 
@@ -1041,6 +1080,9 @@ public class Item extends Loot {
         }
         if (tieredName) {
             map.put("Tiered", tieredName);
+        }
+        if (dropMessage) {
+            map.put("drop-message", dropMessage);
         }
         return map;
     }

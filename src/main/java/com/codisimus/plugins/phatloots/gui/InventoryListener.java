@@ -34,6 +34,7 @@ public class InventoryListener implements Listener {
     private static final int NAVIGATE_AND_MOVE = 0;
     private static final int MODIFY_PROBABILITY_AND_TOGGLE = 1;
     private static final int MODIFY_AMOUNT = 2;
+    private static final int ADD_DROP_MESSAGE = 3;
     private final static int SIZE = 54;
     final static int TOOL_SLOT = SIZE - 9;
     private static final HashMap<UUID, Boolean> switchingPages = new HashMap<>(); //Player -> Going deeper (true) or back (false)
@@ -45,7 +46,8 @@ public class InventoryListener implements Listener {
     static {
         if (NAVIGATE_AND_MOVE != Tool.getToolByName("NAVIGATE_AND_MOVE").getID()
                 || MODIFY_PROBABILITY_AND_TOGGLE != Tool.getToolByName("MODIFY_PROBABILITY_AND_TOGGLE").getID()
-                || MODIFY_AMOUNT != Tool.getToolByName("MODIFY_AMOUNT").getID()) {
+                || MODIFY_AMOUNT != Tool.getToolByName("MODIFY_AMOUNT").getID()
+                || ADD_DROP_MESSAGE != Tool.getToolByName("ADD_DROP_MESSAGE").getID()) {
             PhatLoots.logger.severe("Tool IDs do not match their expected values, Please notify Codisimus!");
         }
     }
